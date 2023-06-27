@@ -37,6 +37,7 @@ public class CBPGDAL {
         try {
             Class.forName(driver);
             conn = DriverManager.getConnection(url, user, pwd);
+            conn.setAutoCommit(false);
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -130,25 +131,171 @@ public class CBPGDAL {
 
     public void insertIssue(ComicIssue issue) {
         Random random = new Random();
-        try {
-            // check for existing writer
-            String sql = "SELECT id FROM comicbooks.writers WHERE name = ?";
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, issue.getWriterName());
-            rs = pstmt.executeQuery();
-            int writerId = 0;
-            if(rs.next()) {
-                writerId = rs.getInt("id");
-            }
-            if(writerId == 0) {
-                writerId = random.nextInt();
-            }
+        boolean success = false;
+        // get writer id
+        int writerId = getExistingWriterId(issue.getWriterName());
+        if(writerId == 0) {
+            writerId = generateRandomId(random);
+            // create entry in db
+            success = insertWriter(writerId, issue.getWriterName());
+        }
+        if(success) {
+            System.out.println("Writer inserted successfully.");
+        }
 
-            System.out.println("Writer ID: " + writerId);
+        
+
+        // get artist id
+        int artistId = getExistingArtistId(issue.getArtistName());
+        if(artistId == 0) {
+            artistId = random.nextInt();
+            // create entry in db
+            success = insertArtist(artistId, issue.getArtistName());
+        }
+
+        // get volume id
+        int volumeId = getExistingVolumeId(issue.getVolumeTitle());
+        if(volumeId == 0) {
+            volumeId = random.nextInt();
+            // create entry in db
+        }
+
+        // get publisher id
+        int publisherId = getExistingPublisherId(issue.getVolumeTitle());
+        if(publisherId == 0) {
+            publisherId = random.nextInt();
+            // create entry in db
+        }
+
+        
+    }
+
+    // insert artist
+    private boolean insertArtist(int id, String artistName) {
+        try {
+            pstmt = conn.prepareStatement("INSERT INTO comicbooks.artists VALUES (?, ?)");
+            pstmt.setInt(1, id);
+            pstmt.setString(2, artistName);
+
+            if(pstmt.executeUpdate() > 0) {
+                conn.commit();
+                return true;
+            }
 
         } catch(Exception e) {
             e.printStackTrace();
         }
+
+        return false;
+    }
+
+
+    // insert writer
+    private boolean insertWriter(int id, String writerName) {
+        try {
+            pstmt = conn.prepareStatement("INSERT INTO comicbooks.writers VALUES (?, ?)");
+            pstmt.setInt(1, id);
+            pstmt.setString(2, writerName);
+
+            if(pstmt.executeUpdate() > 0) {
+                conn.commit();
+                return true;
+            }
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    // check for existing publisher
+    private int getExistingPublisherId(String publisherName) {
+        int publisherId = 0;
+
+        try {
+            String sql = "SELECT id FROM comicbooks.publishers WHERE name = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, publisherName);
+            rs = pstmt.executeQuery();
+            
+            if(rs.next()) {
+                publisherId = rs.getInt("id");
+            }
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        return publisherId;
+    }
+
+    // check for existing volume
+    private int getExistingVolumeId(String volumeTitle) {
+        int volumeId = 0;
+
+        try {
+            String sql = "SELECT id FROM comicbooks.volumes WHERE title = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, volumeTitle);
+            rs = pstmt.executeQuery();
+            
+            if(rs.next()) {
+                volumeId = rs.getInt("id");
+            }
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        return volumeId;
+    }
+
+    // check for existing artist
+    private int getExistingArtistId(String artistName) {
+        int artistId = 0;
+
+        try {
+            String sql = "SELECT id FROM comicbooks.artists WHERE name = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, artistName);
+            rs = pstmt.executeQuery();
+            
+            if(rs.next()) {
+                artistId = rs.getInt("id");
+            }
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        return artistId;
+    }
+
+    // check for existing writer
+    private int getExistingWriterId(String writerName) {
+        int writerId = 0;
+
+        try {
+            String sql = "SELECT id FROM comicbooks.writers WHERE name = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, writerName);
+            rs = pstmt.executeQuery();
+            
+            if(rs.next()) {
+                writerId = rs.getInt("id");
+            }
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        return writerId;
+    }
+
+    // generate random id
+    private int generateRandomId(Random random) {
+        return random.nextInt(Integer.MAX_VALUE) + 1;
     }
 
     private void printResultSet(ResultSet rs) {
