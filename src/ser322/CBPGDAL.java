@@ -71,7 +71,7 @@ public class CBPGDAL {
     public List<ComicIssue> getComicsByWriter(String writerName) {
         List<ComicIssue> comics = new ArrayList<ComicIssue>();
         writerName = "%" + writerName + "%";
-        String sql = "SELECT cb.issue_number, v.title, cb.description, w.name as writer, a.name as artist, p.name as publisher, v.year, cb.price " +
+        String sql = "SELECT cb.id, cb.issue_number, v.title, cb.description, w.name as writer, a.name as artist, p.name as publisher, v.year, cb.price " +
                                     "FROM comicbooks.comic_books cb " +
                                     "JOIN comicbooks.artists a ON a.id = cb.artist_id " +
                                     "JOIN comicbooks.writers w ON w.id = cb.writer_id " +
@@ -96,7 +96,7 @@ public class CBPGDAL {
     public List<ComicIssue> getComicsByArtist(String artistName) {
         List<ComicIssue> comics = new ArrayList<ComicIssue>();
         artistName = "%" + artistName + "%";
-        String sql = "SELECT cb.issue_number, v.title, cb.description, w.name as writer, a.name as artist, p.name as publisher, v.year, cb.price " +
+        String sql = "SELECT cb.id, cb.issue_number, v.title, cb.description, w.name as writer, a.name as artist, p.name as publisher, v.year, cb.price " +
                                     "FROM comicbooks.comic_books cb " +
                                     "JOIN comicbooks.artists a ON a.id = cb.artist_id " +
                                     "JOIN comicbooks.writers w ON w.id = cb.writer_id " +
@@ -121,7 +121,7 @@ public class CBPGDAL {
     public List<ComicIssue> getComicsByTitle(String title) {
         List<ComicIssue> comics = new ArrayList<ComicIssue>();
         title = "%" + title + "%";
-        String sql = "SELECT cb.issue_number, v.title, cb.description, w.name as writer, a.name as artist, p.name as publisher, v.year, cb.price " +
+        String sql = "SELECT cb.id cb.issue_number, v.title, cb.description, w.name as writer, a.name as artist, p.name as publisher, v.year, cb.price " +
                                     "FROM comicbooks.comic_books cb " +
                                     "JOIN comicbooks.artists a ON a.id = cb.artist_id " +
                                     "JOIN comicbooks.writers w ON w.id = cb.writer_id " +
@@ -141,6 +141,35 @@ public class CBPGDAL {
         }
 
         return comics;
+    }
+
+    public ComicIssue getIssueById(int id) {
+        List<ComicIssue> comics = new ArrayList<ComicIssue>();
+
+        String sql = "SELECT cb.id, cb.issue_number, v.title, cb.description, w.name as writer, a.name as artist, p.name as publisher, v.year, cb.price " +
+                                    "FROM comicbooks.comic_books cb " +
+                                    "JOIN comicbooks.artists a ON a.id = cb.artist_id " +
+                                    "JOIN comicbooks.writers w ON w.id = cb.writer_id " +
+                                    "JOIN comicbooks.publishers p ON p.id = cb.publisher_id " +
+                                    "JOIN comicbooks.volumes v ON v.id = cb.volume_id " +
+                                    "WHERE cb.id = ?";
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, id);
+
+            rs = pstmt.executeQuery();
+
+            comics = convertResultSetToComicIssues(rs);
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        if(comics.size() > 0) {
+            return comics.get(0);
+        }
+
+        return new ComicIssue();
     }
 
     public void insertIssue(ComicIssue issue) {

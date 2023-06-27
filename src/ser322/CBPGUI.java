@@ -1,5 +1,7 @@
 package ser322;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -20,7 +22,8 @@ public class CBPGUI {
         System.out.println("3) Search for comics by a particular artist.");
         System.out.println("4) Search for comics by title.");
         System.out.println("5) Insert a new comic book issue.");
-        System.out.println("6) Remove a specific issue.");
+        System.out.println("6) Update a specific issue.");
+        System.out.println("7) Remove a specific issue.");
         System.out.println("8) Quit.");
     }
 
@@ -96,6 +99,9 @@ public class CBPGUI {
             ComicIssue issue = handleInsert();
             dal.insertIssue(issue);
         }
+        else if(selection == 6) {
+            handleUpdate();
+        }
         else if(selection == 8) {
             return false;
         }
@@ -103,32 +109,84 @@ public class CBPGUI {
         return true;
     }
 
+    private void handleUpdate() {
+        // get the issue to update based on issue id
+        int id = 0;
+        while(id == 0) {
+            System.out.println("Enter the id number of the issue you want to update.");
+            String idString = input.nextLine();
+            try {
+                id = Integer.parseInt(idString.trim());
+            }
+            catch (Exception e) {
+                System.out.println("Enter a number or type 'cancel' to return to main menu.");
+                id = 0;
+            }
+        }
+
+        ComicIssue issueToUpdate = dal.getIssueById(id);
+
+        // update issue number
+        String msgToUser = "Update Issue Number, or press enter to keep current value (" + issueToUpdate.getIssueNumber() + "): ";
+        String issueNumber = getIssueNumberInput(msgToUser, issueToUpdate.getIssueNumber());
+
+        // update price
+        DecimalFormat formatter = new DecimalFormat("#,###.00");
+        msgToUser = "Update price, or press enter to keep current value (" + formatter.format(issueToUpdate.getPrice()) + "): ";
+        float price = getPriceInput(msgToUser, issueToUpdate.getPrice());
+
+
+        List<ComicIssue> ci = new ArrayList<ComicIssue>();
+        ci.add(issueToUpdate);
+        printResults(ci);
+
+    }
+
+    private String getIssueNumberInput(String msgToUser, String currentIssueNumber) {
+        String issueNumberInput = "";
+        while (issueNumberInput.length() < 1 || issueNumberInput.length() > 25) {
+            System.out.print(msgToUser);
+            issueNumberInput = input.nextLine();
+
+            if(!currentIssueNumber.isEmpty() && issueNumberInput.isEmpty()) {
+                return currentIssueNumber;
+            }
+        }
+        return issueNumberInput;
+    }
+
+    private float getPriceInput(String msgToUser, float price) {
+        float priceInput = 0;
+        String priceString = "";
+
+        while (priceInput == 0) {
+            System.out.print(msgToUser);
+            priceString = input.nextLine();
+            if (price > 0 && priceString.isEmpty()) {
+                return price;
+            } else {
+                try {
+                    priceInput = Float.parseFloat(priceString);
+                } catch (Exception e) {
+                    System.out.println("Please input a decimal value (no $)");
+                }
+            }
+        }
+
+        return priceInput;
+    }
+
     private ComicIssue handleInsert() {
         ComicIssue issue = new ComicIssue();
         
         // get issue number
-        String inpuString = "";
-        while(inpuString.length() < 1 || inpuString.length() > 25) {
-            System.out.print("Enter issue number: ");
-            inpuString = input.nextLine();
-        }
+        String msgToUser = "Enter issue number: ";
+        String inpuString = getIssueNumberInput(msgToUser, "");
         issue.setIssueNumber(inpuString);
 
         // get price
-        float price = 0;
-        boolean success = false;
-        while(!success) {
-            try {
-                System.out.print("Enter price: ");
-                price = input.nextFloat();
-            } catch(InputMismatchException e) {
-                System.out.println("Please enter a decimal.");
-            }
-            if(price != 0) {
-                success = true;
-            }
-            input.nextLine();
-        }
+        msgToUser = "Enter a price: ";
+        float price = getPriceInput(msgToUser, 0);
         issue.setPrice(price);
 
         // get story description
