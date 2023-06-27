@@ -12,6 +12,7 @@ public class ComicIssue {
     private String publisherName;
     private int publicationYear;
     private float price;
+    private boolean isValid = false;
 
     public void setId(int i) {
         id = i;
@@ -40,6 +41,9 @@ public class ComicIssue {
     public void setPrice(float p) {
         price = p;
     }
+    public void setIsValid(boolean t) {
+        isValid = t;
+    }
 
     public int getId() {
         return id;
@@ -67,6 +71,9 @@ public class ComicIssue {
     }
     public float getPrice() {
         return price;
+    }
+    public boolean isValid() {
+        return isValid;
     }
 
     @Override

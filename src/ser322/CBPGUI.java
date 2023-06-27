@@ -100,7 +100,12 @@ public class CBPGUI {
             dal.insertIssue(issue);
         }
         else if(selection == 6) {
-            handleUpdate();
+            ComicIssue issue = handleUpdate();
+            dal.updateIssue(issue);
+        }
+        else if(selection == 7) {
+            int id = handleDelete();
+            dal.deleteIssue(id);
         }
         else if(selection == 8) {
             return false;
@@ -109,7 +114,24 @@ public class CBPGUI {
         return true;
     }
 
-    private void handleUpdate() {
+    private int handleDelete() {
+        int id = 0;
+        while(id == 0) {
+            System.out.println("Enter the id number of the issue you want to delete.");
+            String idString = input.nextLine();
+            try {
+                id = Integer.parseInt(idString.trim());
+            }
+            catch (Exception e) {
+                System.out.println("Enter a number or type 'cancel' to return to main menu.");
+                id = 0;
+            }
+        }
+
+        return id;
+    }
+
+    private ComicIssue handleUpdate() {
         // get the issue to update based on issue id
         int id = 0;
         while(id == 0) {
@@ -128,18 +150,38 @@ public class CBPGUI {
 
         // update issue number
         String msgToUser = "Update Issue Number, or press enter to keep current value (" + issueToUpdate.getIssueNumber() + "): ";
-        String issueNumber = getIssueNumberInput(msgToUser, issueToUpdate.getIssueNumber());
+        issueToUpdate.setIssueNumber(getIssueNumberInput(msgToUser, issueToUpdate.getIssueNumber()));
 
         // update price
         DecimalFormat formatter = new DecimalFormat("#,###.00");
         msgToUser = "Update price, or press enter to keep current value (" + formatter.format(issueToUpdate.getPrice()) + "): ";
-        float price = getPriceInput(msgToUser, issueToUpdate.getPrice());
+        issueToUpdate.setPrice(getPriceInput(msgToUser, issueToUpdate.getPrice()));
 
+        // update description
+        msgToUser = "Update description, or press enter to keep current value (" + issueToUpdate.getDescription().substring(0, 20) + "... ): ";
+        issueToUpdate.setDescription(getDescriptionInput(msgToUser, issueToUpdate.getDescription()));
 
-        List<ComicIssue> ci = new ArrayList<ComicIssue>();
-        ci.add(issueToUpdate);
-        printResults(ci);
+        // update artist
+        msgToUser = "Update artist, or press enter to keep current value (" + issueToUpdate.getArtistName() + "): ";
+        issueToUpdate.setArtistName(getArtistInput(msgToUser, issueToUpdate.getArtistName()));
 
+        // update artist
+        msgToUser = "Update writer, or press enter to keep current value (" + issueToUpdate.getWriterName() + "): ";
+        issueToUpdate.setWriterName(getWriterInput(msgToUser, issueToUpdate.getWriterName()));
+
+        // update publisher
+        msgToUser = "Update publisher, or press enter to keep current value (" + issueToUpdate.getPublisherName() + "): ";
+        issueToUpdate.setPublisherName(getPublisherInput(msgToUser, issueToUpdate.getPublisherName()));
+
+        // update volume title
+        msgToUser = "Update volume title, or press enter to keep current value (" + issueToUpdate.getVolumeTitle() + "): ";
+        issueToUpdate.setVolumeTitle(getVolumeTitleInput(msgToUser, issueToUpdate.getVolumeTitle()));
+
+        // update publication year
+        msgToUser = "Update publication year, or press enter to keep current value (" + issueToUpdate.getPublicationYear() + "): ";
+        issueToUpdate.setPublicationYear(getPublicationYearInput(msgToUser, issueToUpdate.getPublicationYear()));
+
+        return issueToUpdate;
     }
 
     private String getIssueNumberInput(String msgToUser, String currentIssueNumber) {
@@ -176,6 +218,97 @@ public class CBPGUI {
         return priceInput;
     }
 
+    private String getDescriptionInput(String msgToUser, String currentDescription) {
+        String descriptionInput = "";
+        while (descriptionInput.length() < 1 || descriptionInput.length() > 1000) {
+            System.out.print(msgToUser);
+            descriptionInput = input.nextLine();
+
+            if(!currentDescription.isEmpty() && descriptionInput.isEmpty()) {
+                return currentDescription;
+            }
+        }
+        return descriptionInput;
+    }
+
+    private String getArtistInput(String msgToUser, String currentArtist) {
+        String artistInput = "";
+        while (artistInput.length() < 1 || artistInput.length() > 45) {
+            System.out.print(msgToUser);
+            artistInput = input.nextLine();
+
+            if(!currentArtist.isEmpty() && artistInput.isEmpty()) {
+                return currentArtist;
+            }
+        }
+        return artistInput;
+    }
+
+    private String getWriterInput(String msgToUser, String currentWriter) {
+        String writerInput = "";
+        while (writerInput.length() < 1 || writerInput.length() > 45) {
+            System.out.print(msgToUser);
+            writerInput = input.nextLine();
+
+            if(!currentWriter.isEmpty() && writerInput.isEmpty()) {
+                return currentWriter;
+            }
+        }
+        return writerInput;
+    }
+
+    private String getPublisherInput(String msgToUser, String currentPublisher) {
+        String publisherInput = "";
+        while (publisherInput.length() < 1 || publisherInput.length() > 45) {
+            System.out.print(msgToUser);
+            publisherInput = input.nextLine();
+
+            if(!currentPublisher.isEmpty() && publisherInput.isEmpty()) {
+                return currentPublisher;
+            }
+        }
+        return publisherInput;
+    }
+
+    private String getVolumeTitleInput(String msgToUser, String currentVolumeTitle) {
+        String volumeTitleInput = "";
+        while (volumeTitleInput.length() < 1 || volumeTitleInput.length() > 45) {
+            System.out.print(msgToUser);
+            volumeTitleInput = input.nextLine();
+
+            if(!currentVolumeTitle.isEmpty() && volumeTitleInput.isEmpty()) {
+                return currentVolumeTitle;
+            }
+        }
+        return volumeTitleInput;
+    }
+
+    private int getPublicationYearInput(String msgToUser, int year) {
+        int yearInput = 0;
+        String yearString = "";
+
+        while (yearInput == 0) {
+            System.out.print(msgToUser);
+            yearString = input.nextLine();
+            if (year > 0 && yearString.isEmpty()) {
+                return year;
+            } else {
+                try {
+                    yearInput = Integer.parseInt(yearString);
+                    if(yearInput < 1800 || yearInput > 2023) {
+                        System.out.println("Year must be between 1800 and no later than 2023");
+                    }
+                    yearInput = 0;
+                } catch (Exception e) {
+                    System.out.println("Year must be between 1800 and no later than 2023");
+                }
+            }
+        }
+
+        return yearInput;
+    }
+    
+
     private ComicIssue handleInsert() {
         ComicIssue issue = new ComicIssue();
         
@@ -190,56 +323,33 @@ public class CBPGUI {
         issue.setPrice(price);
 
         // get story description
-        inpuString = "";
-        while(inpuString.length() > 1000 || inpuString.length() == 0) {
-            System.out.print("Enter story description: ");
-            inpuString = input.nextLine();
-        }
+        msgToUser = "Enter story description: ";
+        inpuString = getDescriptionInput(msgToUser, inpuString);
         issue.setDescription(inpuString);
 
         // get artist
-        inpuString = "";
-        while(inpuString.length() > 45 || inpuString.length() == 0) {
-            System.out.print("Enter artist name: ");
-            inpuString = input.nextLine();
-        }
+        msgToUser = "Enter artist name: ";
+        inpuString = getArtistInput(msgToUser, inpuString);
         issue.setArtistName(inpuString);
 
         // get writer
-        inpuString = "";
-        while(inpuString.length() > 45 || inpuString.length() == 0) {
-            System.out.print("Enter writer name: ");
-            inpuString = input.nextLine();
-        }
+        msgToUser = "Enter writer name: ";
+        inpuString = getWriterInput(msgToUser, inpuString);
         issue.setWriterName(inpuString);
 
         // get publisher
-        inpuString = "";
-        while(inpuString.length() > 45 || inpuString.length() == 0) {
-            System.out.print("Enter publisher name: ");
-            inpuString = input.nextLine();
-        }
+        msgToUser = "Enter publisher name: ";
+        inpuString = getPublisherInput(msgToUser, inpuString);
         issue.setPublisherName(inpuString);
 
         // get volume title
-        inpuString = "";
-        while(inpuString.length() > 45 || inpuString.length() == 0) {
-            System.out.print("Enter volume title: ");
-            inpuString = input.nextLine();
-        }
+        msgToUser = "Enter volume title: ";
+        inpuString = getVolumeTitleInput(msgToUser, inpuString);
         issue.setVolumeTitle(inpuString);
 
         // get publication year
-        int publicationYear = 0;
-        while(publicationYear < 1800 || publicationYear > 2023) {
-            try {
-                System.out.print("Enter publication year: ");
-                publicationYear = input.nextInt();
-            } catch (InputMismatchException e) {
-                System.out.print("Enter the year as digits.");
-                publicationYear = 0;
-            }
-        }
+        msgToUser = "Enter publication year: ";
+        int publicationYear = getPublicationYearInput(msgToUser, getMainMenuSelection());
         issue.setPublicationYear(publicationYear);
         
         System.out.println(issue);

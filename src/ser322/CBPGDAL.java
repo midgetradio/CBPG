@@ -232,6 +232,84 @@ public class CBPGDAL {
         
     }
 
+    public void updateIssue(ComicIssue issue) {
+        Random random = new Random();
+        boolean success = false;
+        
+        // get writer id
+        int writerId = getExistingWriterId(issue.getWriterName());
+        if(writerId == 0) {
+            writerId = generateRandomId(random);
+            // create entry in db
+            success = insertWriter(writerId, issue.getWriterName());
+        }
+
+        // get artist id
+        int artistId = getExistingArtistId(issue.getArtistName());
+        if(artistId == 0) {
+            artistId = random.nextInt();
+            // create entry in db
+            success = insertArtist(artistId, issue.getArtistName());
+        }
+
+        // get volume id
+        int volumeId = getExistingVolumeId(issue.getVolumeTitle());
+        if(volumeId == 0) {
+            volumeId = random.nextInt();
+            // create entry in db
+            success = insertVolume(volumeId, issue.getVolumeTitle(), issue.getPublicationYear());
+        }
+
+        // get publisher id
+        int publisherId = getExistingPublisherId(issue.getVolumeTitle());
+        if(publisherId == 0) {
+            publisherId = random.nextInt();
+            // create entry in db
+            success = insertPublisher(publisherId, issue.getPublisherName());
+        }
+
+        // update the issue
+        try {
+            String sql = "UPDATE comicbooks.comic_books cb SET cb.issue_number = ?, cb.price = ?, cb.description = ?, cb.artist_id = ?, cb.writer_id = ?, cb.publisher_id = ?, cb.volume_id = ? WHERE cb.id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, issue.getIssueNumber());
+            pstmt.setFloat(2, issue.getPrice());
+            pstmt.setString(3, issue.getDescription());
+            pstmt.setInt(4, artistId);
+            pstmt.setInt(5, writerId);
+            pstmt.setInt(6, publisherId);
+            pstmt.setInt(7, volumeId);
+            pstmt.setInt(8, issue.getId());
+
+            if(pstmt.executeUpdate() > 0) {
+                conn.commit();
+                System.out.println("Issue updated successfully.");
+            }
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        
+    }
+
+    // delete an issue
+    public void deleteIssue(int id) {
+        try {
+            String sql = "DELETE FROM comicbooks.comic_books cb WHERE cb.id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, id);
+
+             if(pstmt.executeUpdate() > 0) {
+                conn.commit();
+                System.out.println("Issue deleted successfully.");
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     // insert publisher
     private boolean insertPublisher(int id, String publisherName) {
         try {
