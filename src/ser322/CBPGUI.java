@@ -1,6 +1,7 @@
 package ser322;
 
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 public class CBPGUI {
@@ -20,12 +21,17 @@ public class CBPGUI {
         System.out.println("4) Search for comics by title.");
         System.out.println("5) Insert a new comic book issue.");
         System.out.println("6) Remove a specific issue.");
+        System.out.println("8) Quit.");
+    }
+
+    public void displayEndProgramMessage() {
+        System.out.println("Thank you for using the Comic Book Price Guide.");
     }
 
     public int getMainMenuSelection() {
         int selection = 0;
-        while (selection < 1 || selection > 6) {
-            System.out.println("Please enter a number between 1 and 6.");
+        while (selection < 1 || selection > 8) {
+            System.out.println("Please enter a number between 1 and 8.");
             try {
                 selection = input.nextInt();
             } catch (InputMismatchException exception) {
@@ -43,7 +49,7 @@ public class CBPGUI {
         boolean success = false;
 
         while (!success) {
-            System.out.println("Please enter the search term.");
+            System.out.println("Please enter the search term, or enter 'cancel' to return to the main menu.");
             try {
                 selection = input.nextLine();
             } catch (InputMismatchException exception) {
@@ -56,26 +62,45 @@ public class CBPGUI {
         return selection;
     }
 
-    public void handleMainMenuSelection(int selection) {
+    public boolean handleMainMenuSelection(int selection) {
+        
         if(selection == 1) {
-            dal.getTopTenComics();
+            List<ComicIssue> comics = dal.getTopTenComics();
+            printResults(comics);
         }
         else if(selection == 2) {
             String writer = getStringInput();
-            dal.getComicsByWriter(writer);
+            if(writer == "cancel") {
+                return true;
+            }
+            List<ComicIssue> comics = dal.getComicsByWriter(writer);
+            printResults(comics);
         }
         else if(selection == 3) {
             String artist = getStringInput();
-            dal.getComicsByArtist(artist);
+            if(artist == "cancel") {
+                return true;
+            }
+            List<ComicIssue> comics = dal.getComicsByArtist(artist);
+            printResults(comics);
         }
         else if(selection == 4) {
             String title = getStringInput();
-            dal.getComicsByTitle(title);
+            if(title == "cancel") {
+                return true;
+            }
+            List<ComicIssue> comics = dal.getComicsByTitle(title);
+            printResults(comics);
         }
         else if(selection == 5) {
             ComicIssue issue = handleInsert();
             dal.insertIssue(issue);
         }
+        else if(selection == 8) {
+            return false;
+        }
+
+        return true;
     }
 
     private ComicIssue handleInsert() {
@@ -162,6 +187,15 @@ public class CBPGUI {
         System.out.println(issue);
 
         return issue;
+    }
+
+    private void printResults(List<ComicIssue> comics) {
+        for(var c : comics) {
+            System.out.println(c);
+        }
+        System.out.println("Press enter to continue.");
+        input.nextLine();
+
     }
     
 }

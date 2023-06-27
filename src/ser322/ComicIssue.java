@@ -1,6 +1,9 @@
 package ser322;
 
+import java.text.DecimalFormat;
+
 public class ComicIssue {
+    private int id;
     private String issueNumber;
     private String writerName;
     private String artistName;
@@ -10,6 +13,9 @@ public class ComicIssue {
     private int publicationYear;
     private float price;
 
+    public void setId(int i) {
+        id = i;
+    }
     public void setIssueNumber(String n) {
         issueNumber = n;
     }
@@ -35,6 +41,9 @@ public class ComicIssue {
         price = p;
     }
 
+    public int getId() {
+        return id;
+    }
     public String getIssueNumber() {
         return issueNumber;
     }
@@ -62,14 +71,17 @@ public class ComicIssue {
 
     @Override
     public String toString() {
-        String returnString = issueNumber + " \n";
-        returnString += volumeTitle + " \n";
-        returnString += description + " \n";
-        returnString += writerName + " \n";
-        returnString += artistName + " \n";
-        returnString += publisherName + " \n";
-        returnString += publicationYear + " \n";
-        returnString += price + " \n";
+        DecimalFormat formatter = new DecimalFormat("#,###.00");
+
+        String returnString = "ID: " + id + "    ";
+        returnString += "ISSUE NUMBER: " + issueNumber + "    ";
+        returnString += "TITLE: " + volumeTitle + "    ";
+        returnString += "DESC: " + description + "    ";
+        returnString += "WRITER: " + writerName + "    ";
+        returnString += "ARTIST: " + artistName + "    ";
+        returnString += "PUBLISHER: " + publisherName + "    ";
+        returnString += "YEAR: " + publicationYear + "    ";
+        returnString += "PRICE: $" + formatter.format(price);
 
         return returnString;
     }
