@@ -169,9 +169,10 @@ public class CBPGDAL {
         return new ComicIssue();
     }
 
-    public void insertIssue(ComicIssue issue) {
+    public String insertIssue(ComicIssue issue) {
         Random random = new Random();
         boolean success = false;
+        String resultMsg = "";
         
         // get writer id
         int writerId = getExistingWriterId(issue.getWriterName());
@@ -179,30 +180,42 @@ public class CBPGDAL {
             writerId = generateRandomId(random);
             // create entry in db
             success = insertWriter(writerId, issue.getWriterName());
+            if(!success) {
+                resultMsg += "Problem inserting writer.\n";
+            }
         }
 
         // get artist id
         int artistId = getExistingArtistId(issue.getArtistName());
         if(artistId == 0) {
-            artistId = random.nextInt();
+            artistId = generateRandomId(random);
             // create entry in db
             success = insertArtist(artistId, issue.getArtistName());
+            if(!success) {
+                resultMsg += "Problem inserting artist.\n";
+            }
         }
 
         // get volume id
         int volumeId = getExistingVolumeId(issue.getVolumeTitle());
         if(volumeId == 0) {
-            volumeId = random.nextInt();
+            volumeId = generateRandomId(random);
             // create entry in db
             success = insertVolume(volumeId, issue.getVolumeTitle(), issue.getPublicationYear());
+            if(!success) {
+                resultMsg += "Problem inserting volume.\n";
+            }
         }
 
         // get publisher id
-        int publisherId = getExistingPublisherId(issue.getVolumeTitle());
+        int publisherId = getExistingPublisherId(issue.getPublisherName());
         if(publisherId == 0) {
-            publisherId = random.nextInt();
+            publisherId = generateRandomId(random);
             // create entry in db
             success = insertPublisher(publisherId, issue.getPublisherName());
+            if(!success) {
+                resultMsg += "Problem inserting publisher.\n";
+            }
         }
 
         // insert the issue
@@ -219,17 +232,21 @@ public class CBPGDAL {
 
             if(pstmt.executeUpdate() > 0) {
                 conn.commit();
-                System.out.println("Issue inserted successfully.");
+                resultMsg += "Issue inserted successfully.";
+            }
+            else {
+                resultMsg += "Problem inserting issue.";
             }
 
         } catch(Exception e) {
             e.printStackTrace();
         }
 
-        
+        return resultMsg;
     }
 
-    public void updateIssue(ComicIssue issue) {
+    public String updateIssue(ComicIssue issue) {
+        String resultMsg = "";
         Random random = new Random();
         boolean success = false;
         
@@ -239,30 +256,42 @@ public class CBPGDAL {
             writerId = generateRandomId(random);
             // create entry in db
             success = insertWriter(writerId, issue.getWriterName());
+            if(!success) {
+                resultMsg += "Problem inserting writer.\n";
+            }
         }
 
         // get artist id
         int artistId = getExistingArtistId(issue.getArtistName());
         if(artistId == 0) {
-            artistId = random.nextInt();
+            artistId = generateRandomId(random);
             // create entry in db
             success = insertArtist(artistId, issue.getArtistName());
+            if(!success) {
+                resultMsg += "Problem inserting artist.\n";
+            }
         }
 
         // get volume id
         int volumeId = getExistingVolumeId(issue.getVolumeTitle());
         if(volumeId == 0) {
-            volumeId = random.nextInt();
+            volumeId = generateRandomId(random);
             // create entry in db
             success = insertVolume(volumeId, issue.getVolumeTitle(), issue.getPublicationYear());
+            if(!success) {
+                resultMsg += "Problem inserting volume.\n";
+            }
         }
 
         // get publisher id
         int publisherId = getExistingPublisherId(issue.getVolumeTitle());
         if(publisherId == 0) {
-            publisherId = random.nextInt();
+            publisherId = generateRandomId(random);
             // create entry in db
             success = insertPublisher(publisherId, issue.getPublisherName());
+            if(!success) {
+                resultMsg += "Problem inserting publisher.\n";
+            }
         }
 
         // update the issue
@@ -280,14 +309,18 @@ public class CBPGDAL {
 
             if(pstmt.executeUpdate() > 0) {
                 conn.commit();
-                System.out.println("Issue updated successfully.");
+                resultMsg += "Issue updated successfully.";
+            }
+
+            else {
+                resultMsg += "Problem updating issue.";
             }
 
         } catch(Exception e) {
             e.printStackTrace();
         }
 
-        
+        return resultMsg;
     }
 
     // delete an issue

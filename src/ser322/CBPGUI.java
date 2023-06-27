@@ -1,7 +1,6 @@
 package ser322;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -102,13 +101,15 @@ public class CBPGUI {
         else if(selection == 5) {
             ComicIssue issue = handleInsert();
             if(issue.isValid()) {
-                dal.insertIssue(issue);
+                String msg = dal.insertIssue(issue);
+                System.out.println(msg);
             }
         }
         else if(selection == 6) {
             ComicIssue issue = handleUpdate();
             if(issue.isValid()) {
-                dal.updateIssue(issue);
+                String msg = dal.updateIssue(issue);
+                System.out.println(msg);
             }
         }
         else if(selection == 7) {
@@ -175,7 +176,11 @@ public class CBPGUI {
         issueToUpdate.setPrice(getPriceInput(msgToUser, issueToUpdate.getPrice()));
 
         // update description
-        msgToUser = "Update description, or press enter to keep current value (" + issueToUpdate.getDescription().substring(0, 20) + "... ): ";
+        int index = 20;
+        if(issueToUpdate.getDescription().length() < index) {
+            index = issueToUpdate.getDescription().length();
+        }
+        msgToUser = "Update description, or press enter to keep current value (" + issueToUpdate.getDescription().substring(0, index) + "... ): ";
         issueToUpdate.setDescription(getDescriptionInput(msgToUser, issueToUpdate.getDescription()));
 
         // update artist
@@ -197,6 +202,8 @@ public class CBPGUI {
         // update publication year
         msgToUser = "Update publication year, or press enter to keep current value (" + issueToUpdate.getPublicationYear() + "): ";
         issueToUpdate.setPublicationYear(getPublicationYearInput(msgToUser, issueToUpdate.getPublicationYear()));
+
+        issueToUpdate.setIsValid(true);
 
         return issueToUpdate;
     }
@@ -314,8 +321,8 @@ public class CBPGUI {
                     yearInput = Integer.parseInt(yearString);
                     if(yearInput < 1800 || yearInput > 2023) {
                         System.out.println("Year must be between 1800 and no later than 2023");
+                        yearInput = 0;
                     }
-                    yearInput = 0;
                 } catch (Exception e) {
                     System.out.println("Year must be between 1800 and no later than 2023");
                 }
@@ -341,35 +348,37 @@ public class CBPGUI {
 
         // get story description
         msgToUser = "Enter story description: ";
-        inpuString = getDescriptionInput(msgToUser, inpuString);
+        inpuString = getDescriptionInput(msgToUser, "");
         issue.setDescription(inpuString);
 
         // get artist
         msgToUser = "Enter artist name: ";
-        inpuString = getArtistInput(msgToUser, inpuString);
+        inpuString = getArtistInput(msgToUser, "");
         issue.setArtistName(inpuString);
 
         // get writer
         msgToUser = "Enter writer name: ";
-        inpuString = getWriterInput(msgToUser, inpuString);
+        inpuString = getWriterInput(msgToUser, "");
         issue.setWriterName(inpuString);
 
         // get publisher
         msgToUser = "Enter publisher name: ";
-        inpuString = getPublisherInput(msgToUser, inpuString);
+        inpuString = getPublisherInput(msgToUser, "");
         issue.setPublisherName(inpuString);
 
         // get volume title
         msgToUser = "Enter volume title: ";
-        inpuString = getVolumeTitleInput(msgToUser, inpuString);
+        inpuString = getVolumeTitleInput(msgToUser, "");
         issue.setVolumeTitle(inpuString);
 
         // get publication year
         msgToUser = "Enter publication year: ";
-        int publicationYear = getPublicationYearInput(msgToUser, getMainMenuSelection());
+        int publicationYear = getPublicationYearInput(msgToUser, 0);
         issue.setPublicationYear(publicationYear);
+
+        issue.setIsValid(true);
         
-        System.out.println(issue);
+        // System.out.println(issue);
 
         return issue;
     }
