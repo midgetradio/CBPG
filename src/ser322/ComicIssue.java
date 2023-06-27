@@ -3,6 +3,7 @@ package ser322;
 import java.text.DecimalFormat;
 
 public class ComicIssue {
+    // private member variables
     private int id;
     private String issueNumber;
     private String writerName;
@@ -14,37 +15,7 @@ public class ComicIssue {
     private float price;
     private boolean isValid = false;
 
-    public void setId(int i) {
-        id = i;
-    }
-    public void setIssueNumber(String n) {
-        issueNumber = n;
-    }
-    public void setWriterName(String w) {
-        writerName = w;
-    }
-    public void setArtistName(String a) {
-        artistName = a;
-    }
-    public void setDescription(String d) {
-        description = d;
-    }
-    public void setVolumeTitle(String vt) {
-        volumeTitle = vt;
-    }
-    public void setPublisherName(String pn) {
-        publisherName = pn;
-    }
-    public void setPublicationYear(int py) {
-        publicationYear = py;
-    }
-    public void setPrice(float p) {
-        price = p;
-    }
-    public void setIsValid(boolean t) {
-        isValid = t;
-    }
-
+    // getters
     public int getId() {
         return id;
     }
@@ -76,6 +47,39 @@ public class ComicIssue {
         return isValid;
     }
 
+    // setters
+    public void setId(int i) {
+        id = i;
+    }
+    public void setIssueNumber(String n) {
+        issueNumber = n;
+    }
+    public void setWriterName(String w) {
+        writerName = w;
+    }
+    public void setArtistName(String a) {
+        artistName = a;
+    }
+    public void setDescription(String d) {
+        description = d;
+    }
+    public void setVolumeTitle(String vt) {
+        volumeTitle = vt;
+    }
+    public void setPublisherName(String pn) {
+        publisherName = pn;
+    }
+    public void setPublicationYear(int py) {
+        publicationYear = py;
+    }
+    public void setPrice(float p) {
+        price = p;
+    }
+    public void setIsValid(boolean t) {
+        isValid = t;
+    }
+
+    // override toString for pretty printing
     @Override
     public String toString() {
         DecimalFormat formatter = new DecimalFormat("#,###.00");
@@ -92,6 +96,4 @@ public class ComicIssue {
 
         return returnString;
     }
-
-    
 }

@@ -7,14 +7,15 @@ import java.util.List;
 import java.util.Scanner;
 
 public class CBPGUI {
-    CBPGDAL dal = null;
-    Scanner input = null;
+    private CBPGDAL dal = null;
+    private Scanner input = null;
 
     public CBPGUI(CBPGDAL d, Scanner s) {
         dal = d;
         input = s;
     }
 
+    // This is the main menu for the user
     public void displayMainMenu() {
         System.out.println("Welcome to Comic Book Price Guide. Please choose an option below.");
         System.out.println("1) View Top 10 Most Expensive Books.");
@@ -27,18 +28,20 @@ public class CBPGUI {
         System.out.println("8) Quit.");
     }
 
+    // This message displays when the user terminates the program
     public void displayEndProgramMessage() {
         System.out.println("Thank you for using the Comic Book Price Guide.");
     }
 
+    // Get user input at the main menu selection screen
     public int getMainMenuSelection() {
         int selection = 0;
         while (selection < 1 || selection > 8) {
-            System.out.println("Please enter a number between 1 and 8.");
+            System.out.print("Please enter a number between 1 and 8: ");
             try {
                 selection = input.nextInt();
             } catch (InputMismatchException exception) {
-                System.out.println("Input must be a number.");
+                System.out.print("Input must be a number: ");
                 input.nextLine();
                 selection = 0;
             }
@@ -47,16 +50,17 @@ public class CBPGUI {
         return selection;
     }
 
+    // Getting general string input from the user, used for entering search terms
     private String getStringInput() {
         String selection = "";
         boolean success = false;
 
         while (!success) {
-            System.out.println("Please enter the search term, or enter 'cancel' to return to the main menu.");
+            System.out.print("Please enter the search term, or enter 'cancel' to return to the main menu: ");
             try {
                 selection = input.nextLine();
             } catch (InputMismatchException exception) {
-                System.out.println("Input must be a string.");
+                System.out.print("Input must be a string: ");
                 input.nextLine();
                 selection = "";
             }
@@ -65,15 +69,15 @@ public class CBPGUI {
         return selection;
     }
 
+    // This method executes the appropriate code depending on what the user selected from the main menu
     public boolean handleMainMenuSelection(int selection) {
-        
         if(selection == 1) {
             List<ComicIssue> comics = dal.getTopTenComics();
             printResults(comics);
         }
         else if(selection == 2) {
             String writer = getStringInput();
-            if(writer == "cancel") {
+            if(writer.equals("cancel")) {
                 return true;
             }
             List<ComicIssue> comics = dal.getComicsByWriter(writer);
@@ -81,7 +85,7 @@ public class CBPGUI {
         }
         else if(selection == 3) {
             String artist = getStringInput();
-            if(artist == "cancel") {
+            if(artist.equals("cancel")) {
                 return true;
             }
             List<ComicIssue> comics = dal.getComicsByArtist(artist);
@@ -89,7 +93,7 @@ public class CBPGUI {
         }
         else if(selection == 4) {
             String title = getStringInput();
-            if(title == "cancel") {
+            if(title.equals("cancel")) {
                 return true;
             }
             List<ComicIssue> comics = dal.getComicsByTitle(title);
@@ -97,11 +101,15 @@ public class CBPGUI {
         }
         else if(selection == 5) {
             ComicIssue issue = handleInsert();
-            dal.insertIssue(issue);
+            if(issue.isValid()) {
+                dal.insertIssue(issue);
+            }
         }
         else if(selection == 6) {
             ComicIssue issue = handleUpdate();
-            dal.updateIssue(issue);
+            if(issue.isValid()) {
+                dal.updateIssue(issue);
+            }
         }
         else if(selection == 7) {
             int id = handleDelete();
@@ -114,16 +122,17 @@ public class CBPGUI {
         return true;
     }
 
+    // Get the id of the issue the user wants to delete, and execute the delete method in the DAL
     private int handleDelete() {
         int id = 0;
         while(id == 0) {
-            System.out.println("Enter the id number of the issue you want to delete.");
+            System.out.print("Enter the id number of the issue you want to delete: ");
             String idString = input.nextLine();
             try {
                 id = Integer.parseInt(idString.trim());
             }
             catch (Exception e) {
-                System.out.println("Enter a number or type 'cancel' to return to main menu.");
+                System.out.print("Enter a number or type 'cancel' to return to main menu: ");
                 id = 0;
             }
         }
@@ -131,17 +140,25 @@ public class CBPGUI {
         return id;
     }
 
+    // Get the issue the user wants to update, and execute the update method in the DAL
     private ComicIssue handleUpdate() {
         // get the issue to update based on issue id
         int id = 0;
         while(id == 0) {
-            System.out.println("Enter the id number of the issue you want to update.");
+            System.out.print("Enter the id number of the issue you want to update (type 'cancel' to return to the main menu): ");
             String idString = input.nextLine();
+
+            if(idString.trim().equals("cancel")) {
+                ComicIssue issue = new ComicIssue();
+                issue.setIsValid(false);
+                return issue;
+            }
+
             try {
                 id = Integer.parseInt(idString.trim());
             }
             catch (Exception e) {
-                System.out.println("Enter a number or type 'cancel' to return to main menu.");
+                System.out.print("Enter a number or type 'cancel' to return to main menu:");
                 id = 0;
             }
         }

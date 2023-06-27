@@ -1,16 +1,13 @@
 package ser322;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.sql.SQLException;
 
 public class CBPGDAL {
     String user;
@@ -474,7 +471,7 @@ public class CBPGDAL {
 
     // generate random id
     private int generateRandomId(Random random) {
-        return random.nextInt(Integer.MAX_VALUE) + 1;
+        return random.nextInt(Integer.MAX_VALUE - 1);
     }
 
     private List<ComicIssue> convertResultSetToComicIssues(ResultSet rs) {
