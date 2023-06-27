@@ -378,6 +378,9 @@ public class CBPGDAL {
                 ComicIssue comicIssue = new ComicIssue();
                 comicIssue.setId(rs.getInt("Id"));
                 comicIssue.setIssueNumber(rs.getString("Issue_Number"));
+                comicIssue.setWriterName(rs.getString("Writer"));
+                comicIssue.setArtistName(rs.getString("Artist"));
+                comicIssue.setDescription(rs.getString("Description"));
                 comicIssue.setVolumeTitle(rs.getString("Title"));
                 comicIssue.setPublisherName(rs.getString("Publisher"));
                 comicIssue.setPublicationYear(rs.getInt("Year"));

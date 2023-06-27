@@ -190,12 +190,12 @@ public class CBPGUI {
     }
 
     private void printResults(List<ComicIssue> comics) {
+        System.out.println("*** RESULTS ***");
         for(var c : comics) {
             System.out.println(c);
         }
         System.out.println("Press enter to continue.");
         input.nextLine();
-
     }
     
 }

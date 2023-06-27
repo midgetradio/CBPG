@@ -76,12 +76,12 @@ public class ComicIssue {
         String returnString = "ID: " + id + "    ";
         returnString += "ISSUE NUMBER: " + issueNumber + "    ";
         returnString += "TITLE: " + volumeTitle + "    ";
-        returnString += "DESC: " + description + "    ";
         returnString += "WRITER: " + writerName + "    ";
         returnString += "ARTIST: " + artistName + "    ";
         returnString += "PUBLISHER: " + publisherName + "    ";
         returnString += "YEAR: " + publicationYear + "    ";
-        returnString += "PRICE: $" + formatter.format(price);
+        returnString += "PRICE: $" + formatter.format(price) + "\n";
+        returnString += "DESC: " + description + "\n";
 
         return returnString;
     }
