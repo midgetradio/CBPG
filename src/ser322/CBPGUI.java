@@ -73,11 +73,12 @@ public class CBPGUI {
             dal.getComicsByTitle(title);
         }
         else if(selection == 5) {
-            handleInsert();
+            ComicIssue issue = handleInsert();
+            dal.insertIssue(issue);
         }
     }
 
-    private void handleInsert() {
+    private ComicIssue handleInsert() {
         ComicIssue issue = new ComicIssue();
         
         // get issue number
@@ -159,6 +160,8 @@ public class CBPGUI {
         issue.setPublicationYear(publicationYear);
         
         System.out.println(issue);
+
+        return issue;
     }
     
 }

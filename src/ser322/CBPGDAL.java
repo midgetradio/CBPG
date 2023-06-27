@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
+import java.util.Random;
 import java.sql.SQLException;
 
 public class CBPGDAL {
@@ -121,6 +122,29 @@ public class CBPGDAL {
             rs = pstmt.executeQuery();
 
             printResultSet(rs);
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void insertIssue(ComicIssue issue) {
+        Random random = new Random();
+        try {
+            // check for existing writer
+            String sql = "SELECT id FROM comicbooks.writers WHERE name = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, issue.getWriterName());
+            rs = pstmt.executeQuery();
+            int writerId = 0;
+            if(rs.next()) {
+                writerId = rs.getInt("id");
+            }
+            if(writerId == 0) {
+                writerId = random.nextInt();
+            }
+
+            System.out.println("Writer ID: " + writerId);
 
         } catch(Exception e) {
             e.printStackTrace();
