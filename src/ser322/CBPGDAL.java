@@ -10,14 +10,14 @@ import java.util.List;
 import java.util.Random;
 
 public class CBPGDAL {
-    String user;
-    String pwd;
-    String url;
-    String driver;
-    Statement stmt = null;
-    Connection conn = null;
-    ResultSet rs = null;
-    PreparedStatement pstmt = null;
+    private String user;
+    private String pwd;
+    private String url;
+    private String driver;
+    private Statement stmt = null;
+    private Connection conn = null;
+    private ResultSet rs = null;
+    private PreparedStatement pstmt = null;
 
     public CBPGDAL() {
         super();
@@ -32,6 +32,7 @@ public class CBPGDAL {
         createConnection();
     }
 
+    // create the connection to the db
     private void createConnection() {
         try {
             Class.forName(driver);
@@ -43,6 +44,7 @@ public class CBPGDAL {
         }
     }
 
+    // gets the top 10 comics
     public List<ComicIssue> getTopTenComics() {
         List<ComicIssue> comics = new ArrayList<ComicIssue>();
         try{
@@ -61,10 +63,10 @@ public class CBPGDAL {
         } catch(Exception e) {
             e.printStackTrace();
         }
-
         return comics;
     }
 
+    // search for comics by writer
     public List<ComicIssue> getComicsByWriter(String writerName) {
         List<ComicIssue> comics = new ArrayList<ComicIssue>();
         writerName = "%" + writerName + "%";
@@ -90,6 +92,7 @@ public class CBPGDAL {
         return comics;
     }
 
+    // search for comics by artist
     public List<ComicIssue> getComicsByArtist(String artistName) {
         List<ComicIssue> comics = new ArrayList<ComicIssue>();
         artistName = "%" + artistName + "%";
@@ -115,10 +118,11 @@ public class CBPGDAL {
         return comics;
     }
 
+    // search for comics by volume title
     public List<ComicIssue> getComicsByTitle(String title) {
         List<ComicIssue> comics = new ArrayList<ComicIssue>();
         title = "%" + title + "%";
-        String sql = "SELECT cb.id cb.issue_number, v.title, cb.description, w.name as writer, a.name as artist, p.name as publisher, v.year, cb.price " +
+        String sql = "SELECT cb.id, cb.issue_number, v.title, cb.description, w.name as writer, a.name as artist, p.name as publisher, v.year, cb.price " +
                                     "FROM comicbooks.comic_books cb " +
                                     "JOIN comicbooks.artists a ON a.id = cb.artist_id " +
                                     "JOIN comicbooks.writers w ON w.id = cb.writer_id " +
@@ -140,6 +144,7 @@ public class CBPGDAL {
         return comics;
     }
 
+    // get a comic issue by the id
     public ComicIssue getIssueById(int id) {
         List<ComicIssue> comics = new ArrayList<ComicIssue>();
 
@@ -169,12 +174,13 @@ public class CBPGDAL {
         return new ComicIssue();
     }
 
+    // insert an issue into the database
     public String insertIssue(ComicIssue issue) {
         Random random = new Random();
         boolean success = false;
         String resultMsg = "";
         
-        // get writer id
+        // get writer id if it exists, if not generate a new id
         int writerId = getExistingWriterId(issue.getWriterName());
         if(writerId == 0) {
             writerId = generateRandomId(random);
@@ -185,7 +191,7 @@ public class CBPGDAL {
             }
         }
 
-        // get artist id
+        // get artist id if it exists, if not generate a new id
         int artistId = getExistingArtistId(issue.getArtistName());
         if(artistId == 0) {
             artistId = generateRandomId(random);
@@ -196,7 +202,7 @@ public class CBPGDAL {
             }
         }
 
-        // get volume id
+        // get volume id if it exists, if not generate a new id
         int volumeId = getExistingVolumeId(issue.getVolumeTitle());
         if(volumeId == 0) {
             volumeId = generateRandomId(random);
@@ -207,7 +213,7 @@ public class CBPGDAL {
             }
         }
 
-        // get publisher id
+        // get publisher id if it exists, if not generate a new id
         int publisherId = getExistingPublisherId(issue.getPublisherName());
         if(publisherId == 0) {
             publisherId = generateRandomId(random);
@@ -245,12 +251,13 @@ public class CBPGDAL {
         return resultMsg;
     }
 
+    // update and issue in the database
     public String updateIssue(ComicIssue issue) {
         String resultMsg = "";
         Random random = new Random();
         boolean success = false;
         
-        // get writer id
+        // get writer id if it exists, if not generate a new id
         int writerId = getExistingWriterId(issue.getWriterName());
         if(writerId == 0) {
             writerId = generateRandomId(random);
@@ -261,7 +268,7 @@ public class CBPGDAL {
             }
         }
 
-        // get artist id
+        // get artist id if it exists, if not generate a new id
         int artistId = getExistingArtistId(issue.getArtistName());
         if(artistId == 0) {
             artistId = generateRandomId(random);
@@ -272,7 +279,7 @@ public class CBPGDAL {
             }
         }
 
-        // get volume id
+        // get volume id if it exists, if not generate a new id
         int volumeId = getExistingVolumeId(issue.getVolumeTitle());
         if(volumeId == 0) {
             volumeId = generateRandomId(random);
@@ -283,7 +290,7 @@ public class CBPGDAL {
             }
         }
 
-        // get publisher id
+        // get publisher id if it exists, if not generate a new id
         int publisherId = getExistingPublisherId(issue.getVolumeTitle());
         if(publisherId == 0) {
             publisherId = generateRandomId(random);
@@ -324,7 +331,7 @@ public class CBPGDAL {
     }
 
     // delete an issue
-    public void deleteIssue(int id) {
+    public boolean deleteIssue(int id) {
         try {
             String sql = "DELETE FROM comicbooks.comic_books cb WHERE cb.id = ?";
             pstmt = conn.prepareStatement(sql);
@@ -332,12 +339,13 @@ public class CBPGDAL {
 
              if(pstmt.executeUpdate() > 0) {
                 conn.commit();
-                System.out.println("Issue deleted successfully.");
+                return true;
             }
         } catch(Exception e) {
             e.printStackTrace();
         }
 
+        return false;
     }
 
     // insert publisher
@@ -507,9 +515,10 @@ public class CBPGDAL {
         return random.nextInt(Integer.MAX_VALUE - 1);
     }
 
+    // convert a sql result set into comic issue objects
     private List<ComicIssue> convertResultSetToComicIssues(ResultSet rs) {
         List<ComicIssue> comics = new ArrayList<ComicIssue>();
-        
+        boolean resultsExist = false;        
         try {
             while (rs.next()) {
                 ComicIssue comicIssue = new ComicIssue();
@@ -522,9 +531,18 @@ public class CBPGDAL {
                 comicIssue.setPublisherName(rs.getString("Publisher"));
                 comicIssue.setPublicationYear(rs.getInt("Year"));
                 comicIssue.setPrice(rs.getFloat("Price"));
+                comicIssue.setIsValid(true);
 
                 comics.add(comicIssue);
+                resultsExist = true;
             }
+
+            if(!resultsExist) {
+                ComicIssue comicIssue = new ComicIssue();
+                comicIssue.setIsValid(false);
+                comics.add(comicIssue);
+            }
+
         } catch(Exception e) {
             e.printStackTrace();
         }

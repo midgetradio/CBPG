@@ -49,25 +49,6 @@ public class CBPGUI {
         return selection;
     }
 
-    // Getting general string input from the user, used for entering search terms
-    private String getStringInput() {
-        String selection = "";
-        boolean success = false;
-
-        while (!success) {
-            System.out.print("Please enter the search term, or enter 'cancel' to return to the main menu: ");
-            try {
-                selection = input.nextLine();
-            } catch (InputMismatchException exception) {
-                System.out.print("Input must be a string: ");
-                input.nextLine();
-                selection = "";
-            }
-            success = true;
-        }
-        return selection;
-    }
-
     // This method executes the appropriate code depending on what the user selected from the main menu
     public boolean handleMainMenuSelection(int selection) {
         if(selection == 1) {
@@ -114,7 +95,13 @@ public class CBPGUI {
         }
         else if(selection == 7) {
             int id = handleDelete();
-            dal.deleteIssue(id);
+            boolean success = dal.deleteIssue(id);
+            if(!success) {
+                System.out.println("Issue not found.");
+            }
+            else {
+                System.out.println("Issue deleted successfully.");
+            }
         }
         else if(selection == 8) {
             return false;
@@ -123,7 +110,26 @@ public class CBPGUI {
         return true;
     }
 
-    // Get the id of the issue the user wants to delete, and execute the delete method in the DAL
+    // Getting general string input from the user, used for entering search terms
+    private String getStringInput() {
+        String selection = "";
+        boolean success = false;
+
+        while (!success) {
+            System.out.print("Please enter the search term, or enter 'cancel' to return to the main menu: ");
+            try {
+                selection = input.nextLine();
+            } catch (InputMismatchException exception) {
+                System.out.print("Input must be a string: ");
+                input.nextLine();
+                selection = "";
+            }
+            success = true;
+        }
+        return selection;
+    }
+
+    // Get the id of the issue the user wants to delete, and return the id to the dal
     private int handleDelete() {
         int id = 0;
         while(id == 0) {
@@ -141,7 +147,7 @@ public class CBPGUI {
         return id;
     }
 
-    // Get the issue the user wants to update, and execute the update method in the DAL
+    // Get the issue the user wants to update, cast to an issue object with user provided updated values to be returned to the dal
     private ComicIssue handleUpdate() {
         // get the issue to update based on issue id
         int id = 0;
@@ -175,7 +181,7 @@ public class CBPGUI {
         msgToUser = "Update price, or press enter to keep current value (" + formatter.format(issueToUpdate.getPrice()) + "): ";
         issueToUpdate.setPrice(getPriceInput(msgToUser, issueToUpdate.getPrice()));
 
-        // update description
+        // update description - display a truncated string if the description is longer than 20 characters
         int index = 20;
         if(issueToUpdate.getDescription().length() < index) {
             index = issueToUpdate.getDescription().length();
@@ -208,6 +214,7 @@ public class CBPGUI {
         return issueToUpdate;
     }
 
+    // get the issue number input from the user
     private String getIssueNumberInput(String msgToUser, String currentIssueNumber) {
         String issueNumberInput = "";
         while (issueNumberInput.length() < 1 || issueNumberInput.length() > 25) {
@@ -221,6 +228,7 @@ public class CBPGUI {
         return issueNumberInput;
     }
 
+    // get the price input from the user
     private float getPriceInput(String msgToUser, float price) {
         float priceInput = 0;
         String priceString = "";
@@ -238,10 +246,10 @@ public class CBPGUI {
                 }
             }
         }
-
         return priceInput;
     }
 
+    // get the description input from the user
     private String getDescriptionInput(String msgToUser, String currentDescription) {
         String descriptionInput = "";
         while (descriptionInput.length() < 1 || descriptionInput.length() > 1000) {
@@ -255,6 +263,7 @@ public class CBPGUI {
         return descriptionInput;
     }
 
+    // get the artist name input from the user
     private String getArtistInput(String msgToUser, String currentArtist) {
         String artistInput = "";
         while (artistInput.length() < 1 || artistInput.length() > 45) {
@@ -268,6 +277,7 @@ public class CBPGUI {
         return artistInput;
     }
 
+    // get the writer name input from the user
     private String getWriterInput(String msgToUser, String currentWriter) {
         String writerInput = "";
         while (writerInput.length() < 1 || writerInput.length() > 45) {
@@ -281,6 +291,7 @@ public class CBPGUI {
         return writerInput;
     }
 
+    // get the publisher name input from the user
     private String getPublisherInput(String msgToUser, String currentPublisher) {
         String publisherInput = "";
         while (publisherInput.length() < 1 || publisherInput.length() > 45) {
@@ -294,6 +305,7 @@ public class CBPGUI {
         return publisherInput;
     }
 
+    // get the volume title input from the user
     private String getVolumeTitleInput(String msgToUser, String currentVolumeTitle) {
         String volumeTitleInput = "";
         while (volumeTitleInput.length() < 1 || volumeTitleInput.length() > 45) {
@@ -307,6 +319,7 @@ public class CBPGUI {
         return volumeTitleInput;
     }
 
+    // get the publication year input from the user
     private int getPublicationYearInput(String msgToUser, int year) {
         int yearInput = 0;
         String yearString = "";
@@ -328,11 +341,10 @@ public class CBPGUI {
                 }
             }
         }
-
         return yearInput;
     }
     
-
+    // get user input for an issue to be inserted into the db and cast it to an issue object to be returned to the dal
     private ComicIssue handleInsert() {
         ComicIssue issue = new ComicIssue();
         
@@ -377,16 +389,20 @@ public class CBPGUI {
         issue.setPublicationYear(publicationYear);
 
         issue.setIsValid(true);
-        
-        // System.out.println(issue);
-
         return issue;
     }
 
+    // print the results of a query
     private void printResults(List<ComicIssue> comics) {
+        System.out.println();
         System.out.println("*** RESULTS ***");
         for(var c : comics) {
-            System.out.println(c);
+            if(c.isValid()) {
+                System.out.println(c);
+            }
+            else {
+                System.out.println("No results...");
+            }
         }
         System.out.println("Press enter to continue.");
         input.nextLine();
