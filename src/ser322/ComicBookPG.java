@@ -29,5 +29,4 @@ public class ComicBookPG {
         // end program and display the end program message
         ui.displayEndProgramMessage();
     }
-    
 }
