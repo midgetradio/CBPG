@@ -15,6 +15,7 @@ public class CPGCLI {
         handleArgs();
     }
 
+    // getters
     public String getUrl() {
         return url;
     }
@@ -37,7 +38,8 @@ public class CPGCLI {
         return validArgumentsMessage;
     }
 
-    public boolean handleArgs() {
+    // handle cli arguments and set variables as appropriate
+    public void handleArgs() {
         for(int i = 0; i < args.length; i+=2) {
             if(args[i].equals("-u")) {
                 user = args[i+1];
@@ -56,8 +58,5 @@ public class CPGCLI {
                 valid = false;
             }
         }
-
-        return true;
     }
-
 }
