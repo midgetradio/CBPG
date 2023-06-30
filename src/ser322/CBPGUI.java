@@ -407,5 +407,4 @@ public class CBPGUI {
         System.out.println("Press enter to continue.");
         input.nextLine();
     }
-    
 }

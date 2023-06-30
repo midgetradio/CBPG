@@ -85,10 +85,10 @@ public class ComicIssue {
         DecimalFormat formatter = new DecimalFormat("#,###.00");
 
         String returnString = "ID: " + id + "    ";
-        returnString += "ISSUE NUMBER: " + issueNumber + "    ";
-        returnString += "TITLE: " + volumeTitle + "    ";
+        returnString += "ISSUE NUMBER: " + issueNumber + "    \n";
+        returnString += "TITLE: " + volumeTitle + "    \n";
         returnString += "WRITER: " + writerName + "    ";
-        returnString += "ARTIST: " + artistName + "    ";
+        returnString += "ARTIST: " + artistName + "    \n";
         returnString += "PUBLISHER: " + publisherName + "    ";
         returnString += "YEAR: " + publicationYear + "    ";
         returnString += "PRICE: $" + formatter.format(price) + "\n";
