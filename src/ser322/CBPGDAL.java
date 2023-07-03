@@ -291,7 +291,7 @@ public class CBPGDAL {
         }
 
         // get publisher id if it exists, if not generate a new id
-        int publisherId = getExistingPublisherId(issue.getVolumeTitle());
+        int publisherId = getExistingPublisherId(issue.getPublisherName());
         if(publisherId == 0) {
             publisherId = generateRandomId(random);
             // create entry in db
